@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include <type_traits>
+#include <tuple>
 
 template<bool>
 struct Check;
@@ -54,10 +56,9 @@ template
 	template <class> class ReferencePolicy = DefaultReferencePolicy,
 	typename CastingType = ReferencePolicy<T>::type
 >
-CastingType safe_cast(U& t)
+constexpr CastingType safe_cast(U&& u, typename Check<CheckPolicy<T, U>::value>::type * = nullptr)
 {
-	const bool b = Check<CheckPolicy<T, U>::value>::value;
-	return (CastingType) t;
+	return (CastingType) u;
 }
 
 int main()
@@ -65,8 +66,9 @@ int main()
 	// Checking an integral type
 	{
 		std::cout << "Checking a conversation of an integral type" << std::endl;
-		float s = 12.0;
-		std::cout << safe_cast<int>(s) << std::endl;
+		float s = 12.45f;
+		std::cout << safe_cast<int>(s) << std::endl; // Will be called in runtime due to the dynamic value
+		std::cout << safe_cast<float, int>(5) << std::endl;
 		std::cout << std::endl;
 	}
 
@@ -108,17 +110,33 @@ int main()
 		std::cout << std::endl;
 	}
 
-	// Try to cast an integral or float type to a structure with a different size
+	// Working with tuples
 	{
-		struct Pos
+		struct Pos3D
 		{
-			Pos(float x, float y) : x(x), y(y) { }
-			float x, y;
+			Pos3D(float x, float y, float z) : x(x), y(y), z(z) { }
+
+			void print()
+			{
+				std::cout << x << ' ' << y << ' ' << z;
+			}
+
+			float x, y, z;
 		};
 
-		
-		float f = safe_cast<float>(Pos({ 346.4365f, 496.843f })); // Error while compiling!
-		std::cout << std::endl;
+		// Create Position-Object
+		Pos3D p(346.4365f, 4562.46765f, 45.0f);
+
+		// Reference the Position Object to a tuple
+		std::tuple<float, float, float>& posTuple = safe_cast<decltype(posTuple)>(p);
+
+		// Change the tuple's content
+		std::get<0>(posTuple) = 5.46f;
+		std::get<1>(posTuple) = 938.509f;
+		std::get<2>(posTuple) = 1964.3959f;
+
+		// Print the tuple's content via a referenced Pos3D-Object
+		safe_cast<Pos3D>(posTuple).print();
 	}
 
 	std::cin.get();
