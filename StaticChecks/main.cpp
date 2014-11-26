@@ -118,14 +118,17 @@ int main()
 
 			void print()
 			{
-				std::cout << x << ' ' << y << ' ' << z;
+				std::cout << x << ' ' << y << ' ' << z << std::endl;
 			}
 
 			float x, y, z;
 		};
 
+		std::cout << "Working with tuples" << std::endl;
+
 		// Create Position-Object
 		Pos3D p(346.4365f, 4562.46765f, 45.0f);
+		p.print();
 
 		// Reference the Position Object to a tuple
 		std::tuple<float, float, float>& posTuple = safe_cast<decltype(posTuple)>(p);
@@ -137,6 +140,9 @@ int main()
 
 		// Print the tuple's content via a referenced Pos3D-Object
 		safe_cast<Pos3D>(posTuple).print();
+		p.print();
+
+		std::cout << std::endl;
 	}
 
 	std::cin.get();
