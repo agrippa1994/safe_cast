@@ -26,6 +26,9 @@ struct CastIfSameSize
 	enum { value = CastIfSameSizeHelper<sizeof(T) == sizeof(U)>::value };
 };
 
+template<class T, class U>
+using CastIfNotSameSize = !CastIfSameSize<T, U>;
+
 template<typename T, bool>
 struct DefaultReferencePolicyHelper;
 
@@ -65,6 +68,8 @@ int main()
 {
 	// Checking an integral type
 	{
+		//safe_cast<int, float, CastIfSameSize, DefaultReferencePolicy>();
+
 		std::cout << "Checking a conversation of an integral type" << std::endl;
 		float s = 12.45f;
 		std::cout << safe_cast<int>(s) << std::endl; // Will be called in runtime due to the dynamic value
